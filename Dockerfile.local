@@ -1,0 +1,13 @@
+FROM python:latest
+
+RUN mkdir /code
+WORKDIR /code
+
+RUN pip install --upgrade poetry
+
+COPY pyproject.toml .
+COPY poetry.lock .
+
+RUN poetry install
+
+CMD ["poetry", "run", "watchgod", "streambot.main.main"]
