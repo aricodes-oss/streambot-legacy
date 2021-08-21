@@ -13,6 +13,9 @@ line-length = 95
 target-version = [ "py39",]
 experimental-string-processing = true
 
+[tool.poetry.scripts]
+streambot = "streambot.main:main"
+
 [tool.poetry.dependencies]
 python = "^3.7"
 peewee = "^3.14.4"
