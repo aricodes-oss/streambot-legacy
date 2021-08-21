@@ -38,6 +38,7 @@ async def handle(message, game_name):
             "Unable to delete existing streams! Please give me permissions to manage this"
             " channel to suppress this message.",
         )
+        return
 
     try:
         Stream.delete().where(Stream.reservation == res)
