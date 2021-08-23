@@ -31,16 +31,22 @@ async def _update(reservation):
     live_usernames = {s["user_login"] for s in live_streams}
     known_usernames = {s.username for s in reservation.streams}
 
-    # Remove old streams
-    messages_to_delete = [
-        Object(id=stream.message_id)
-        for stream in reservation.streams
-        if stream.username not in live_usernames
-    ]
-    if len(messages_to_delete) > 0:
-        await channel.delete_messages(messages_to_delete)
+    try:
+        # Remove old streams
+        messages_to_delete = [
+            Object(id=stream.message_id)
+            for stream in reservation.streams
+            if stream.username not in live_usernames
+        ]
+        if len(messages_to_delete) > 0:
+            await channel.delete_messages(messages_to_delete)
 
-    Stream.delete().where(Stream.message_id << [m.id for m in messages_to_delete])
+        Stream.delete().where(Stream.message_id << [m.id for m in messages_to_delete])
+    except Exception:
+        await channel.send(
+            "Unable to delete existing streams! Please give me permissions to manage this"
+            " channel to suppress this message.",
+        )
 
     # Add new ones
     new_streams = [
