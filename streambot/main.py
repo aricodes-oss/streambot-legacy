@@ -1,10 +1,9 @@
 import asyncio
-from datetime import timedelta
+from contextlib import suppress
 
 from . import env, subscribe, unsubscribe, worker
 from .discord import client
 
-from timeloop import Timeloop
 
 SUBSCRIBE = "!subscribe"
 UNSUBSCRIBE = "!unsubscribe"
@@ -18,7 +17,9 @@ async def on_ready():
     print("Ret-2-Go!")
 
     while True:
-        await worker.work()
+        with suppress(Exception):
+            await worker.work()
+
         await asyncio.sleep(5)
 
 

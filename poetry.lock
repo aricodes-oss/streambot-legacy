@@ -367,14 +367,6 @@ socks = ["PySocks (>=1.5.6,!=1.5.7)", "win-inet-pton"]
 use_chardet_on_py3 = ["chardet (>=3.0.2,<5)"]
 
 [[package]]
-name = "timeloop"
-version = "1.0.2"
-description = "An elegant way to run period tasks."
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "toml"
 version = "0.10.2"
 description = "Python Library for Tom's Obvious, Minimal Language"
@@ -463,7 +455,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "93847f2d225b2525b289a6ee35a5b39a6c645021cdfe9b62cedd7d63d779a5da"
+content-hash = "623f9b8334eb9416cfe117f98feae3983590017f06d254d42ec7694b7701c26a"
 
 [metadata.files]
 aiohttp = [
@@ -696,10 +688,6 @@ regex = [
 requests = [
     {file = "requests-2.26.0-py2.py3-none-any.whl", hash = "sha256:6c1246513ecd5ecd4528a0906f910e8f0f9c6b8ec72030dc9fd154dc1a6efd24"},
     {file = "requests-2.26.0.tar.gz", hash = "sha256:b8aa58f8cf793ffd8782d3d8cb19e66ef36f7aba4353eec859e74678b01b07a7"},
-]
-timeloop = [
-    {file = "timeloop-1.0.2-py2-none-any.whl", hash = "sha256:70cb69eeef39968ea0e6dd68a3a3a51257d5f4aa27b177ab1b19ca86ff525946"},
-    {file = "timeloop-1.0.2.tar.gz", hash = "sha256:4e716c67fe6bcadcee7ddb91e2520792426818a70f27e630cfbbbd9becc48a13"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
