@@ -1,3 +1,4 @@
+from contextlib import suppress
 from discord import Object
 
 from . import twitch
@@ -27,23 +28,15 @@ async def handle(message, game_name):
         await message.channel.send(f"This channel is not subscribed to {game_name} streams.")
         return
 
-    try:
+    with suppress(Exception):
         message_ids = [
             Object(id=stream.message_id)
             for stream in Stream.select().where(Stream.reservation == res)
         ]
         await message.channel.delete_messages(message_ids)
-    except Exception:
-        await message.channel.send(
-            "Unable to delete existing streams! Please give me permissions to manage this"
-            " channel to suppress this message.",
-        )
-        return
 
-    try:
+    with suppress(Exception):
         Stream.delete().where(Stream.reservation == res)
         res.delete_instance()
 
-        await message.channel.send("Unsubscribed!")
-    except Exception:
-        pass
+    await message.channel.send("Unsubscribed!")
