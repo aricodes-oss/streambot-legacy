@@ -1,4 +1,4 @@
-from asyncio import create_task, run
+from contextlib import suppress
 
 from . import twitch
 
@@ -24,7 +24,16 @@ def _embed(stream):
 
 async def _update(reservation):
     guild = client.get_guild(reservation.guild_id)
-    channel = guild.get_channel(reservation.channel_id)
+    try:
+        channel = guild.get_channel(reservation.channel_id)
+    except Exception:
+        # Channel no longer exists maybe
+        if reservation.strikes >= 5:
+            reservation.delete_instance()
+        else:
+            reservation.strikes += 1
+            reservation.save()
+        return
 
     live_streams = await twitch.get_streams(reservation.game_id)
 
@@ -64,4 +73,5 @@ async def _update(reservation):
 
 async def work():
     for reservation in Reservation.select().prefetch(Stream):
-        await _update(reservation)
+        with suppress(Exception):
+            await _update(reservation)
