@@ -2,6 +2,10 @@
 
 [Invite this bot to your server](https://discord.com/api/oauth2/authorize?client_id=878381224794656778&permissions=0&scope=bot)
 
+## What does this bot do?
+
+StreamBot will maintain a list of currently live Twitch streams in your Discord server, categorized by game. It will automatically delete old messages when the streamer goes offline, making a fully automated solution for your speedrunning community or other game-centric discord.
+
 ## How to use
 
 1. Invite the bot to your server
