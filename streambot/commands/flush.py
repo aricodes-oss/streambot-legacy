@@ -9,6 +9,7 @@ from discord import Object
 
 async def _work():
     await client.login(env("DISCORD_BOT_TOKEN"))
+    t = asyncio.create_task(client.start())
     for reservation in Reservation.select().prefetch(Stream):
         try:
             guild = client.get_guild(reservation.guild_id)
@@ -28,6 +29,7 @@ async def _work():
         for stream in reservation.streams:
             stream.delete_instance()
         print("Deleted all stream instances")
+    await t
 
 
 def main():
