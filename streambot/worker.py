@@ -64,11 +64,15 @@ async def _update(reservation):
 
     for stream in new_streams:
         message = await channel.send(embed=_embed(stream))
-        Stream.create(
-            reservation=reservation,
-            username=stream["user_login"],
-            message_id=message.id,
-        )
+
+        try:
+            Stream.create(
+                reservation=reservation,
+                username=stream["user_login"],
+                message_id=message.id,
+            )
+        except Exception:
+            await message.delete()
 
 
 async def work():
