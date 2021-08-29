@@ -15,6 +15,7 @@ experimental-string-processing = true
 
 [tool.poetry.scripts]
 streambot = "streambot.main:main"
+flush = "streambot.commands.flush:main"
 
 [tool.poetry.dependencies]
 python = "^3.7"
