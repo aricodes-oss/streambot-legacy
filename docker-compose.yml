@@ -8,3 +8,6 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ./:/code
+
+  cache:
+    image: redis:latest

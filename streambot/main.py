@@ -1,5 +1,6 @@
-import asyncio
 from contextlib import suppress
+
+from discord.ext import tasks
 
 from . import env, subscribe, unsubscribe, worker
 from .discord import client
@@ -11,16 +12,18 @@ UNSUBSCRIBE = "!unsubscribe"
 TRIGGERS = [SUBSCRIBE, UNSUBSCRIBE]
 
 
+@tasks.loop(seconds=5)
+async def work():
+    with suppress(Exception):
+        await worker.work()
+
+
 @client.event
 async def on_ready():
     print(f"Logged in as {client.user}")
     print("Ret-2-Go!")
 
-    while True:
-        with suppress(Exception):
-            await worker.work()
-
-        await asyncio.sleep(5)
+    work.start()
 
 
 @client.event
