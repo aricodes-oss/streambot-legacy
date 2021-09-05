@@ -21,9 +21,9 @@ flush = "streambot.commands.flush:main"
 python = "^3.7"
 peewee = "^3.14.4"
 python-dotenv = "^0.19.0"
-"discord.py" = "^1.7.3"
 python-environ = "^0.4.54"
 requests = "^2.26.0"
+py-cord = "^1.7.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
