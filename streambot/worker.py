@@ -12,7 +12,7 @@ def _embed(stream):
     result = Embed(
         title=stream["user_name"],
         description=stream["title"],
-        url=f"https://twitch.tv/{stream['user_name']}",
+        url=f"https://twitch.tv/{stream['user_login']}",
         color=0x0099FF,
     )
 
