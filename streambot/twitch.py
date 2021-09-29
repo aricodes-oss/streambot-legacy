@@ -4,7 +4,7 @@ from .cache import cached
 import aiohttp
 
 
-@cached("token", ttl=30)
+@cached(ttl=30)
 async def _get_token():
     async with aiohttp.ClientSession() as session:
         async with session.post(
@@ -25,7 +25,7 @@ async def _headers():
     }
 
 
-@cached("game", ttl=120)
+@cached(ttl=120)
 async def get_game(name):
     params = {"name": name}
 
@@ -43,7 +43,7 @@ async def get_game(name):
 
 # Let multiple discords share the same stream pool
 # to avoid API rate limiting
-@cached("streams", ttl=30)
+@cached(ttl=30)
 async def get_streams(game_id):
     async with aiohttp.ClientSession() as session:
         async with session.get(

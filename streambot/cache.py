@@ -4,10 +4,10 @@ from typing import Callable
 cache = Cache(Cache.REDIS, endpoint="cache", port=6379)
 
 
-def cached(name: str, ttl: int = 30):
+def cached(ttl: int = 30):
     def decorator_cached(func: Callable):
         async def wrapped_func(*args, **kwargs):
-            key: str = name + str(args) + str(kwargs)
+            key: str = func.__name__ + str(args) + str(kwargs)
             cached_value: str = await cache.get(key)
 
             if cached_value is not None:
