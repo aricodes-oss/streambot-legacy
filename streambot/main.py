@@ -6,7 +6,7 @@ from . import env, subscribe, unsubscribe, worker
 from .discord import client
 
 
-SUBSCRIBE = "!ssubscribe"
+SUBSCRIBE = "!subscribe"
 UNSUBSCRIBE = "!unsubscribe"
 
 TRIGGERS = [SUBSCRIBE, UNSUBSCRIBE]
