@@ -6,7 +6,7 @@ async def handle(message, game_name):
     await message.channel.send("Sure! One moment while I look up that game.")
     guild_id = message.guild.id
     channel_id = message.channel.id
-    available_games = twitch.get_game(game_name)
+    available_games = await twitch.get_game(game_name)
 
     if len(available_games) != 1:
         await message.channel.send(

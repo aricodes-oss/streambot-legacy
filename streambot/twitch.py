@@ -1,45 +1,54 @@
 from . import env
-from .cache import cache
+from .cache import cached
 
-import requests
-
-
-@cache.cache(ttl=30)
-def _get_token():
-    res = requests.post(
-        "https://id.twitch.tv/oauth2/token",
-        params={
-            "client_id": env("TWITCH_CLIENT_ID"),
-            "client_secret": env("TWITCH_CLIENT_SECRET"),
-            "grant_type": "client_credentials",
-        },
-    )
-
-    return res.json()["access_token"]
+import aiohttp
 
 
-def _headers():
-    return {"Authorization": f"Bearer {_get_token()}", "Client-Id": env("TWITCH_CLIENT_ID")}
+@cached("token", ttl=30)
+async def _get_token():
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+            "https://id.twitch.tv/oauth2/token",
+            params={
+                "client_id": env("TWITCH_CLIENT_ID"),
+                "client_secret": env("TWITCH_CLIENT_SECRET"),
+                "grant_type": "client_credentials",
+            },
+        ) as res:
+            return (await res.json())["access_token"]
 
 
-@cache.cache(ttl=120)
-def get_game(name):
+async def _headers():
+    return {
+        "Authorization": f"Bearer {await _get_token()}",
+        "Client-Id": env("TWITCH_CLIENT_ID"),
+    }
+
+
+@cached("game", ttl=120)
+async def get_game(name):
     params = {"name": name}
 
-    res = requests.get("https://api.twitch.tv/helix/games", params=params, headers=_headers())
-    json = res.json()
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            "https://api.twitch.tv/helix/games", params=params, headers=await _headers()
+        ) as res:
+            json = await res.json()
 
-    if json is not None:
-        return json.get("data")
+            if json is not None:
+                return json.get("data")
 
-    return []
+            return []
 
 
+# Let multiple discords share the same stream pool
+# to avoid API rate limiting
+@cached("streams", ttl=30)
 async def get_streams(game_id):
-    response = requests.get(
-        "https://api.twitch.tv/helix/streams",
-        params={"game_id": game_id},
-        headers=_headers(),
-    )
-
-    return response.json()["data"]
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            "https://api.twitch.tv/helix/streams",
+            params={"game_id": game_id},
+            headers=await _headers(),
+        ) as res:
+            return (await res.json())["data"]

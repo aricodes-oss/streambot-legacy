@@ -8,7 +8,7 @@ from .db import Reservation, Stream
 async def handle(message, game_name):
     guild_id = message.guild.id
     channel_id = message.channel.id
-    available_games = twitch.get_game(game_name)
+    available_games = await twitch.get_game(game_name)
 
     if len(available_games) != 1:
         await message.channel.send(
@@ -36,7 +36,8 @@ async def handle(message, game_name):
         await message.channel.delete_messages(message_ids)
 
     with suppress(Exception):
-        Stream.delete().where(Stream.reservation == res)
+        for stream in res.streams:
+            stream.delete_instance()
         res.delete_instance()
 
     await message.channel.send("Unsubscribed!")

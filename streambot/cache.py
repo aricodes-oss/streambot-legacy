@@ -1,5 +1,23 @@
-from redis import StrictRedis
-from redis_cache import RedisCache
+from aiocache import Cache
+from typing import Callable
 
-client = StrictRedis(host="cache", decode_responses=True)
-cache = RedisCache(redis_client=client)
+cache = Cache(Cache.REDIS, endpoint="cache", port=6379)
+
+
+def cached(name: str, ttl: int = 30):
+    def decorator_cached(func: Callable):
+        async def wrapped_func(*args, **kwargs):
+            key: str = name + str(args) + str(kwargs)
+            cached_value: str = await cache.get(key)
+
+            if cached_value is not None:
+                return cached_value
+
+            result = await func(*args, **kwargs)
+            await cache.set(key, result, ttl=ttl)
+
+            return result
+
+        return wrapped_func
+
+    return decorator_cached
