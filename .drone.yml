@@ -13,6 +13,7 @@ trigger:
 steps:
   - name: build
     image: thegeeklab/drone-docker-buildx
+    privileged: true
     settings:
       repo: cluster.gov:5000/streambot
       tags:
