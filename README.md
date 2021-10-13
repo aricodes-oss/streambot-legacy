@@ -11,7 +11,7 @@ StreamBot will maintain a list of currently live Twitch streams in your Discord 
 1. Invite the bot to your server
 2. Create a channel in your server that you want to act as a stream catalog
 3. Give the bot "manage channel" and "manage messages" permissions for that channel
-4. In that channel, send a message reading `!subscribe nameofgame` for every game you want to have catalogued in there
+4. In that channel, send a message reading `!subscribe nameofgame` or `!speedrun nameofgame` for every game you want to have catalogued in there
 
 For example, you can send:
 
@@ -20,7 +20,7 @@ For example, you can send:
 !subscribe Axiom Verge 2
 ```
 
-to keep the channel updated with both games.
+to keep the channel updated with both games. The `!speedrun` command filters the list to only streams that have the `speedrun` tag enabled.
 
 You can unsubscribe from these messages at any time in a similar manner:
 
