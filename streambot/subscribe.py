@@ -2,7 +2,7 @@ from . import twitch
 from .db import Reservation
 
 
-async def handle(message, game_name):
+async def handle(message, game_name, speedrun_only=False):
     await message.channel.send("Sure! One moment while I look up that game.")
     guild_id = message.guild.id
     channel_id = message.channel.id
@@ -33,6 +33,8 @@ async def handle(message, game_name):
     except Exception:
         pass
 
-    Reservation.create(guild_id=guild_id, channel_id=channel_id, game_id=game_id)
+    Reservation.create(
+        guild_id=guild_id, channel_id=channel_id, game_id=game_id, speedrun_only=speedrun_only
+    )
 
     await message.channel.send("Subscribed!")

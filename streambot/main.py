@@ -8,8 +8,9 @@ from .discord import client
 
 SUBSCRIBE = "!subscribe"
 UNSUBSCRIBE = "!unsubscribe"
+SPEEDRUN = "!speedrun"
 
-TRIGGERS = [SUBSCRIBE, UNSUBSCRIBE]
+TRIGGERS = [SUBSCRIBE, UNSUBSCRIBE, SPEEDRUN]
 
 
 @tasks.loop(seconds=5)
@@ -51,10 +52,11 @@ async def on_message(message):
         await message.channel.send("Please specify a game name!")
         return
 
-    await {SUBSCRIBE: subscribe.handle, UNSUBSCRIBE: unsubscribe.handle}[command](
-        message,
-        game_name,
-    )
+    await {
+        SUBSCRIBE: subscribe.handle,
+        SPEEDRUN: subscribe.handle,
+        UNSUBSCRIBE: unsubscribe.handle,
+    }[command](message, game_name, speedrun_only=command == SPEEDRUN)
 
 
 def main():

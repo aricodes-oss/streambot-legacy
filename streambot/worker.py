@@ -2,6 +2,7 @@ from contextlib import suppress
 
 from . import twitch
 
+from .constants import SPEEDRUN_TAG_ID
 from .discord import client
 from .db import Reservation, Stream
 
@@ -36,6 +37,8 @@ async def _update(reservation):
         return
 
     live_streams = await twitch.get_streams(reservation.game_id)
+    if reservation.speedrun_only:
+        live_streams = [s for s in live_streams if SPEEDRUN_TAG_ID in s.tag_ids]
 
     live_usernames = {s["user_login"] for s in live_streams}
     known_usernames = {s.username for s in reservation.streams}
