@@ -11,7 +11,7 @@ async def clear_channel(reservation: Reservation):
     except Exception:
         return
 
-    known_message_ids = {s.message_id for s in reservation.streams}
+    known_message_ids = {s.message_id for s in Stream.select()}
 
     async for message in channel.history(limit=200):
         # Only delete our own messages
