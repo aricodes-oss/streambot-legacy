@@ -7,7 +7,7 @@ from .discord import client
 
 
 def _t(w):
-    return w.replace("!", "!d") if env.bool("DEBUG") else w
+    return w.replace("!", "!d") if env.bool("DEBUG", default=False) else w
 
 
 SUBSCRIBE = _t("!subscribe")
