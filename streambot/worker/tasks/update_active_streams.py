@@ -1,10 +1,10 @@
 from contextlib import suppress
 
-from . import twitch
+from streambot import twitch
 
-from .constants import SPEEDRUN_TAG_ID
-from .discord import client
-from .db import Reservation, Stream
+from streambot.constants import SPEEDRUN_TAG_ID
+from streambot.discord import client
+from streambot.db import Stream, Reservation
 
 from discord import Embed, Object
 
@@ -38,7 +38,7 @@ async def _update(reservation):
 
     live_streams = await twitch.get_streams(reservation.game_id)
     if reservation.speedrun_only:
-        live_streams = [s for s in live_streams if SPEEDRUN_TAG_ID in s.tag_ids]
+        live_streams = [s for s in live_streams if SPEEDRUN_TAG_ID in s["tag_ids"]]
 
     live_usernames = {s["user_login"] for s in live_streams}
     known_usernames = {s.username for s in reservation.streams}
@@ -78,7 +78,7 @@ async def _update(reservation):
             await message.delete()
 
 
-async def work():
+async def run():
     for reservation in Reservation.select().prefetch(Stream):
         with suppress(Exception):
             await _update(reservation)

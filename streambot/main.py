@@ -6,17 +6,23 @@ from . import env, subscribe, unsubscribe, worker
 from .discord import client
 
 
-SUBSCRIBE = "!subscribe"
-UNSUBSCRIBE = "!unsubscribe"
-SPEEDRUN = "!speedrun"
+def _t(w):
+    return w.replace("!", "!d") if env.bool("DEBUG") else w
+
+
+SUBSCRIBE = _t("!subscribe")
+UNSUBSCRIBE = _t("!unsubscribe")
+SPEEDRUN = _t("!speedrun")
 
 TRIGGERS = [SUBSCRIBE, UNSUBSCRIBE, SPEEDRUN]
 
 
-@tasks.loop(seconds=5)
+@tasks.loop(seconds=30)
 async def work():
-    with suppress(Exception):
+    try:
         await worker.work()
+    except Exception as e:
+        print(e)
 
 
 @client.event
