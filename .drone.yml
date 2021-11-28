@@ -15,6 +15,7 @@ steps:
     image: plugins/docker
     settings:
       repo: cluster.gov:5000/streambot
+      mirror: http://piracy.gov:5001
       tags:
         - latest
       registry: cluster.gov:5000
