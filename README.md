@@ -20,7 +20,12 @@ For example, you can send:
 !subscribe Axiom Verge 2
 ```
 
-to keep the channel updated with both games. The `!speedrun` command filters the list to only streams that have the `speedrun` tag enabled.
+to keep the channel updated with both games. The `!speedrun` command filters the list to only streams that have the `speedrun` tag enabled:
+
+```
+!speedrun Minecraft
+!speedrun Super Mario 64
+```
 
 You can unsubscribe from these messages at any time in a similar manner:
 
