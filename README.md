@@ -1,5 +1,7 @@
 # streambot
 
+[![Build Status](https://drone.aricodes.net/api/badges/aricodes-oss/streambot/status.svg)](https://drone.aricodes.net/aricodes-oss/streambot)
+
 [Invite this bot to your server](https://discord.com/api/oauth2/authorize?client_id=878381224794656778&permissions=0&scope=bot)
 
 ## What does this bot do?
