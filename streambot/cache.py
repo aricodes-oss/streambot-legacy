@@ -16,6 +16,8 @@ def cached(ttl: int = 30):
                 logger.debug(
                     "Cache hit for {}({}, {})".format(func.__name__, str(args), str(kwargs)),
                 )
+                logger.debug(f"Number of results: {len(cached_value)}")
+                logger.debug(f"Cached results: {cached_value}")
                 return cached_value
 
             logger.debug(

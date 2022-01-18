@@ -1,5 +1,6 @@
 from . import twitch
 from .db import Reservation
+from .logging import logger
 
 
 async def handle(message, game_name, speedrun_only=False):
@@ -33,8 +34,15 @@ async def handle(message, game_name, speedrun_only=False):
     except Exception:
         pass
 
+    logger.info(
+        f"Creating reservation for guild {guild_id}/channel {channel_id}/game"
+        f" {game_id} ({game_name}), speedrun_only={speedrun_only}",
+    )
     Reservation.create(
-        guild_id=guild_id, channel_id=channel_id, game_id=game_id, speedrun_only=speedrun_only
+        guild_id=guild_id,
+        channel_id=channel_id,
+        game_id=game_id,
+        speedrun_only=speedrun_only,
     )
 
     await message.channel.send("Subscribed!")

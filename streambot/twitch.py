@@ -26,8 +26,11 @@ async def _headers():
 
 
 @cached(ttl=120)
-async def get_game(name):
+async def get_game(name, cursor=None):
     params = {"name": name}
+
+    if cursor is not None:
+        params["after"] = cursor
 
     async with aiohttp.ClientSession() as session:
         async with session.get(
@@ -37,10 +40,16 @@ async def get_game(name):
         ) as res:
             json = await res.json()
 
-            if json is not None:
-                return json.get("data")
+            if json is None:
+                return []
 
-            return []
+            data = json.get("data")
+            new_cursor = json.get("pagination").get("cursor")
+
+            if new_cursor is not None:
+                return data + await get_game(name, cursor=new_cursor)
+
+            return data
 
 
 # Let multiple discords share the same stream pool
