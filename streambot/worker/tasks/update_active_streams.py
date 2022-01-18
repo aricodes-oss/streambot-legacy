@@ -2,6 +2,7 @@ from contextlib import suppress
 
 from streambot import twitch
 
+from streambot.logging import logger
 from streambot.constants import SPEEDRUN_TAG_ID
 from streambot.discord import client
 from streambot.db import Stream, Reservation
@@ -58,7 +59,7 @@ async def _update(reservation):
             if stream.username not in live_usernames:
                 stream.delete_instance()
     except Exception as e:
-        print(e)
+        logger.error(e)
 
     # Add new ones
     new_streams = [

@@ -1,6 +1,5 @@
-from contextlib import suppress
-
 from discord.ext import tasks
+from .logging import logger
 
 from . import env, subscribe, unsubscribe, worker
 from .discord import client
@@ -22,13 +21,13 @@ async def work():
     try:
         await worker.work()
     except Exception as e:
-        print(e)
+        logger.error(e)
 
 
 @client.event
 async def on_ready():
-    print(f"Logged in as {client.user}")
-    print("Ret-2-Go!")
+    logger.info(f"Logged in as {client.user}")
+    logger.info("Ret-2-Go!")
 
     work.start()
 
@@ -66,5 +65,5 @@ async def on_message(message):
 
 
 def main():
-    print("Connecting...")
+    logger.info("Connecting...")
     client.run(env("DISCORD_BOT_TOKEN"))

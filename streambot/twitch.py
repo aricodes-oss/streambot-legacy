@@ -31,7 +31,9 @@ async def get_game(name):
 
     async with aiohttp.ClientSession() as session:
         async with session.get(
-            "https://api.twitch.tv/helix/games", params=params, headers=await _headers()
+            "https://api.twitch.tv/helix/games",
+            params=params,
+            headers=await _headers(),
         ) as res:
             json = await res.json()
 

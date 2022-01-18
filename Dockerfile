@@ -4,7 +4,7 @@ RUN mkdir /code
 WORKDIR /code
 RUN mkdir streambot
 
-RUN pip install --upgrade poetry
+RUN pip install --upgrade pip poetry
 
 COPY pyproject.toml .
 COPY poetry.lock .
