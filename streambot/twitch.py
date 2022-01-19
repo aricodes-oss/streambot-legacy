@@ -48,7 +48,7 @@ async def get_game(name):
 # to avoid API rate limiting
 @cached(ttl=30)
 async def get_streams(game_id, cursor=None):
-    params = {"game_id": game_id}
+    params = {"game_id": game_id, "first": "100"}
 
     if cursor is not None:
         params["after"] = cursor
