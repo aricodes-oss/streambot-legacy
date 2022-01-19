@@ -65,7 +65,7 @@ async def get_streams(game_id, cursor=None):
             new_cursor = json.get("pagination").get("cursor")
 
             if new_cursor is not None:
-                logger.info("Pagination triggered, fetching")
+                logger.debug(f"Pagination triggered, fetching more for {game_id}")
                 return data + await get_streams(game_id, cursor=new_cursor)
 
             return data
