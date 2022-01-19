@@ -1,5 +1,6 @@
 from . import env
 from .cache import cached
+from .logging import logger
 
 import aiohttp
 
@@ -26,11 +27,8 @@ async def _headers():
 
 
 @cached(ttl=120)
-async def get_game(name, cursor=None):
+async def get_game(name):
     params = {"name": name}
-
-    if cursor is not None:
-        params["after"] = cursor
 
     async with aiohttp.ClientSession() as session:
         async with session.get(
@@ -43,23 +41,31 @@ async def get_game(name, cursor=None):
             if json is None:
                 return []
 
-            data = json.get("data")
-            new_cursor = json.get("pagination").get("cursor")
-
-            if new_cursor is not None:
-                return data + await get_game(name, cursor=new_cursor)
-
-            return data
+            return json.get("data")
 
 
 # Let multiple discords share the same stream pool
 # to avoid API rate limiting
 @cached(ttl=30)
-async def get_streams(game_id):
+async def get_streams(game_id, cursor=None):
+    params = {"game_id": game_id}
+
+    if cursor is not None:
+        params["after"] = cursor
+
     async with aiohttp.ClientSession() as session:
         async with session.get(
             "https://api.twitch.tv/helix/streams",
-            params={"game_id": game_id},
+            params=params,
             headers=await _headers(),
         ) as res:
-            return (await res.json())["data"]
+            json = await res.json()
+
+            data = json.get("data")
+            new_cursor = json.get("pagination").get("cursor")
+
+            if new_cursor is not None:
+                logger.info("Pagination triggered, fetching")
+                return data + await get_streams(game_id, cursor=new_cursor)
+
+            return data
