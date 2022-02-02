@@ -16,7 +16,7 @@ SPEEDRUN = _t("!speedrun")
 TRIGGERS = [SUBSCRIBE, UNSUBSCRIBE, SPEEDRUN]
 
 
-@tasks.loop(seconds=30)
+@tasks.loop(seconds=30, reconnect=True)
 async def work():
     try:
         await worker.work()
@@ -29,7 +29,8 @@ async def on_ready():
     logger.info(f"Logged in as {client.user}")
     logger.info("Ret-2-Go!")
 
-    work.start()
+    if not work.is_running():
+        work.start()
 
 
 @client.event
