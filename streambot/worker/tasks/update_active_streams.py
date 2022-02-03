@@ -1,4 +1,5 @@
 from contextlib import suppress
+from asyncio import create_task
 
 from streambot import twitch
 
@@ -96,6 +97,10 @@ async def _update(reservation):
 
 
 async def run():
+    tasks = []
     for reservation in Reservation.select().prefetch(Stream):
         with suppress(Exception):
-            await _update(reservation)
+            tasks.append(create_task(_update(reservation)))
+
+    for task in tasks:
+        await task
