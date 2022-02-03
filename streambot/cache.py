@@ -1,4 +1,5 @@
 import aioredis
+import json
 from typing import Callable
 
 from streambot.logging import logger
@@ -13,12 +14,19 @@ def cached(ttl: int = 30):
             cached_value: str = await cache.get(key)
 
             if cached_value is not None:
+                parsed_value = cached_value.decode()
+
+                try:
+                    parsed_value = json.loads(cached_value)
+                except json.JSONDecodeError:
+                    pass
+
                 logger.debug(
                     "Cache hit for {}({}, {})".format(func.__name__, str(args), str(kwargs)),
                 )
-                logger.debug(f"Number of results: {len(cached_value)}")
-                logger.debug(f"Cached results: {cached_value}")
-                return cached_value
+                logger.debug(f"Number of results: {len(parsed_value)}")
+                logger.debug(f"Cached results: {parsed_value}")
+                return parsed_value
 
             logger.debug(
                 "Cache miss for {}({}, {})".format(func.__name__, str(args), str(kwargs)),
@@ -26,7 +34,11 @@ def cached(ttl: int = 30):
 
             result = await func(*args, **kwargs)
             if result is not None:
-                await cache.set(key, result, keepttl=ttl)
+                stored_result = result
+                if isinstance(result, list):
+                    stored_result = json.dumps(result)
+
+                await cache.set(key, stored_result, keepttl=ttl)
 
             return result
 

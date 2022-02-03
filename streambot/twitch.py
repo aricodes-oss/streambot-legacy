@@ -7,7 +7,7 @@ import aiohttp
 session = aiohttp.ClientSession()
 
 
-@cached(ttl=30)
+@cached(ttl=5)
 async def _get_token():
     async with session.post(
         "https://id.twitch.tv/oauth2/token",
@@ -17,6 +17,7 @@ async def _get_token():
             "grant_type": "client_credentials",
         },
     ) as res:
+        logger.debug(await res.json())
         return (await res.json())["access_token"]
 
 
@@ -37,6 +38,7 @@ async def get_game(name):
         headers=await _headers(),
     ) as res:
         json = await res.json()
+        logger.debug(json)
 
         if json is None:
             return []
@@ -48,6 +50,7 @@ async def get_game(name):
 # to avoid API rate limiting
 @cached(ttl=30)
 async def get_streams(game_id, cursor=None):
+    logger.debug(f"Fetching streams for {game_id} with cursor {cursor}")
     params = {"game_id": game_id, "first": "100"}
 
     if cursor is not None:
@@ -59,6 +62,7 @@ async def get_streams(game_id, cursor=None):
         headers=await _headers(),
     ) as res:
         json = await res.json()
+        logger.debug(json)
 
         data = json.get("data")
         new_cursor = json.get("pagination").get("cursor")

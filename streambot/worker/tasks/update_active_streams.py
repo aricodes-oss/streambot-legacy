@@ -91,7 +91,7 @@ async def _update(reservation):
         except Exception:
             await message.delete()
 
-        if needs_mid_refresh and posted % 3 == 0:
+        if needs_mid_refresh and posted % 10 == 0:
             streams = Stream.select().where(reservation=reservation)
             known_usernames = {s.username for s in streams}
 

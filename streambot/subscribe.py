@@ -9,7 +9,7 @@ async def handle(message, game_name, speedrun_only=False):
     channel_id = message.channel.id
     available_games = await twitch.get_game(game_name)
 
-    if len(available_games) != 1:
+    if available_games is None or len(available_games) != 1:
         await message.channel.send(
             f"I couldn't find a match for {game_name} - maybe you spelled it differently from"
             " Twitch's database?",
