@@ -31,7 +31,7 @@ def cached(ttl: int = 30):
             if result is not None:
                 stored_result = msgpack.dumps(result)
 
-                await cache.set(key, stored_result, keepttl=ttl)
+                await cache.set(key, stored_result, ex=ttl)
 
             return result
 
