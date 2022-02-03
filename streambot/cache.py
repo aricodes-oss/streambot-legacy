@@ -25,7 +25,7 @@ def cached(ttl: int = 30):
             )
 
             result = await func(*args, **kwargs)
-            await cache.set(key, result, ttl=ttl)
+            await cache.set(key, result, keepttl=ttl)
 
             return result
 
