@@ -1,3 +1,5 @@
+import uvloop
+
 from discord.ext import tasks
 from .logging import logger
 
@@ -66,5 +68,8 @@ async def on_message(message):
 
 
 def main():
+    logger.info("Swapping out event loop with uvloop...")
+    uvloop.install()
+
     logger.info("Connecting...")
     client.run(env("DISCORD_BOT_TOKEN"))
