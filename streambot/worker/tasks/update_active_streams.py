@@ -99,6 +99,6 @@ async def _update(reservation):
 async def run():
     tasks = []
     for reservation in Reservation.select().prefetch(Stream):
-        tasks.append(asyncio.to_thread(_update, reservation))
+        tasks.append(_update(reservation))
 
     await asyncio.gather(*tasks)
