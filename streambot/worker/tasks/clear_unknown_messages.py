@@ -12,11 +12,17 @@ async def clear_channel(reservation: Reservation):
         return
 
     known_message_ids = {s.message_id for s in Stream.select()}
+    checked = 0
 
     async for message in channel.history(limit=200):
         # Only delete our own messages
         if message.author != client.user:
             continue
+
+        # Make sure we're not stepping on our own feet
+        checked += 1
+        if checked % 10 == 0:
+            known_message_ids = {s.message_id for s in Stream.select()}
 
         if message.id not in known_message_ids:
             await message.delete()
