@@ -7,7 +7,7 @@ import aiohttp
 session = aiohttp.ClientSession()
 
 
-@cached(ttl=5)
+@cached(ttl=30)
 async def _get_token():
     async with session.post(
         "https://id.twitch.tv/oauth2/token",
@@ -48,7 +48,7 @@ async def get_game(name):
 
 # Let multiple discords share the same stream pool
 # to avoid API rate limiting
-@cached(ttl=30)
+@cached(ttl=120)
 async def get_streams(game_id, cursor=None):
     logger.debug(f"Fetching streams for {game_id} with cursor {cursor}")
     params = {"game_id": game_id, "first": "100"}
