@@ -1,9 +1,9 @@
-from aiocache import Cache
+import aioredis
 from typing import Callable
 
 from streambot.logging import logger
 
-cache = Cache(Cache.REDIS, endpoint="cache", port=6379)
+cache = aioredis.from_url("redis://cache:6379")
 
 
 def cached(ttl: int = 30):
