@@ -9,7 +9,7 @@ RUN pip install --upgrade pip poetry
 COPY pyproject.toml .
 COPY poetry.lock .
 
-RUN poetry install --no-root
+RUN poetry install --no-root --no-dev
 
 COPY streambot streambot
 RUN rm -f streambot/.env
