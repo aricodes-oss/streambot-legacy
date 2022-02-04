@@ -44,7 +44,11 @@ async def _update(reservation):
         return
 
     if reservation.speedrun_only:
-        live_streams = [s for s in live_streams if SPEEDRUN_TAG_ID in s["tag_ids"]]
+        live_streams = [
+            s
+            for s in live_streams
+            if s["tag_ids"] is not None and SPEEDRUN_TAG_ID in s["tag_ids"]
+        ]
 
     live_usernames = {s["user_login"] for s in live_streams}
     known_usernames = {s.username for s in reservation.streams}
