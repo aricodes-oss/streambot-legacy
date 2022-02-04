@@ -40,6 +40,7 @@ async def _update(reservation):
 
     live_streams = await twitch.get_streams(reservation.game_id, require_cache=True)
     if live_streams is None:  # Cache miss
+        logger.debug(f"No streams for {reservation.game_id}, skipping")
         return
 
     if reservation.speedrun_only:
