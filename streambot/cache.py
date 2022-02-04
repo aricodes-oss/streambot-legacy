@@ -20,7 +20,7 @@ def cached(ttl: int = 30):
                     "Cache hit for {}({}, {})".format(func.__name__, str(args), str(kwargs)),
                 )
                 logger.debug(f"Number of results: {len(parsed_value)}")
-                if len(parsed_value < 5):
+                if len(parsed_value) < 5:
                     logger.debug(f"Cached results: {parsed_value}")
                 return parsed_value
 
