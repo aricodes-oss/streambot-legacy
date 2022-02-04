@@ -80,6 +80,6 @@ async def get_streams(game_id, cursor=None):
 
         if new_cursor is not None:
             logger.debug(f"Pagination triggered, fetching more for {game_id}")
-            return data + await get_streams(game_id, cursor=new_cursor)
+            return data + await get_streams(game_id, cursor=new_cursor, bypass_cache=True)
 
         return data

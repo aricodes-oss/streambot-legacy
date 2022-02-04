@@ -20,13 +20,15 @@ def cached(ttl: int = 30):
                     "Cache hit for {}({}, {})".format(func.__name__, str(args), str(kwargs)),
                 )
                 logger.debug(f"Number of results: {len(parsed_value)}")
-                logger.debug(f"Cached results: {parsed_value}")
+                if len(parsed_value < 5):
+                    logger.debug(f"Cached results: {parsed_value}")
                 return parsed_value
 
             logger.debug(
                 "Cache miss for {}({}, {})".format(func.__name__, str(args), str(kwargs)),
             )
             if require_cache:
+                logger.debug("Cache required but missed")
                 return None
 
             result = await func(*args, **kwargs)
