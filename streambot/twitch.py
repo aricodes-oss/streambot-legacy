@@ -7,6 +7,7 @@ import aiohttp
 session = None
 
 
+# Needed for Celery to tolerate starting a new event loop
 async def configure_session():
     global session
     if session is not None:
@@ -58,7 +59,7 @@ async def get_game(name):
 
 # Let multiple discords share the same stream pool
 # to avoid API rate limiting
-@cached(ttl=120)
+@cached(ttl=45)
 async def get_streams(game_id, cursor=None):
     await configure_session()
     logger.debug(f"Fetching streams for {game_id} with cursor {cursor}")

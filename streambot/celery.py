@@ -9,7 +9,7 @@ app.conf.update(
     beat_schedule={
         "update-cached-streams": {
             "task": "streambot.tasks.update_cached_streams",
-            "schedule": 30.0,
+            "schedule": 15.0,
             "args": (),
         },
     },
