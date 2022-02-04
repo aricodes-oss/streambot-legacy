@@ -1,10 +1,9 @@
-import uvloop
-
 from discord.ext import tasks
 from .logging import logger
 
 from . import env, subscribe, unsubscribe, worker
 from .discord import client
+from .tasks import update_cached_streams
 
 
 def _t(w):
@@ -18,7 +17,7 @@ SPEEDRUN = _t("!speedrun")
 TRIGGERS = [SUBSCRIBE, UNSUBSCRIBE, SPEEDRUN]
 
 
-@tasks.loop(seconds=30, reconnect=True)
+@tasks.loop(seconds=10, reconnect=True)
 async def work():
     try:
         await worker.work()
@@ -32,6 +31,7 @@ async def on_ready():
     logger.info("Ret-2-Go!")
 
     if not work.is_running():
+        update_cached_streams.delay()
         work.start()
 
 
@@ -68,8 +68,5 @@ async def on_message(message):
 
 
 def main():
-    logger.info("Swapping out event loop with uvloop...")
-    uvloop.install()
-
     logger.info("Connecting...")
     client.run(env("DISCORD_BOT_TOKEN"))

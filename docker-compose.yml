@@ -9,5 +9,25 @@ services:
     volumes:
       - ./:/code
 
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./:/code
+    command: poetry run watchmedo auto-restart --patterns="*.py" --recursive -- poetry run celery -A streambot.celery worker --loglevel=INFO -P processes
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./:/code
+    command: poetry run watchmedo auto-restart --patterns="*.py" --recursive -- poetry run celery -A streambot.celery beat --loglevel=INFO
+
   cache:
     image: redis:latest

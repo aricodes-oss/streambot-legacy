@@ -1,4 +1,5 @@
 import environ
+from . import celery  # noqa
 
 env = environ.Env()
 environ.Env.read_env()

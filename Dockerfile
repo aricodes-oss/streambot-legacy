@@ -14,6 +14,6 @@ RUN poetry install --no-root
 COPY streambot streambot
 RUN rm -f streambot/.env
 
-RUN poetry install
+RUN poetry install --no-dev
 
 CMD ["poetry", "run", "streambot"]

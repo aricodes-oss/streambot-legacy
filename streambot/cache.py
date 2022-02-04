@@ -9,11 +9,11 @@ cache = aioredis.from_url("redis://cache:6379")
 
 def cached(ttl: int = 30):
     def decorator_cached(func: Callable):
-        async def wrapped_func(*args, **kwargs):
+        async def wrapped_func(*args, bypass_cache=False, require_cache=False, **kwargs):
             key: str = func.__name__ + str(args) + str(kwargs)
             cached_value: str = await cache.get(key)
 
-            if cached_value is not None:
+            if not bypass_cache and cached_value is not None:
                 parsed_value = msgpack.loads(cached_value)
 
                 logger.debug(
@@ -26,6 +26,8 @@ def cached(ttl: int = 30):
             logger.debug(
                 "Cache miss for {}({}, {})".format(func.__name__, str(args), str(kwargs)),
             )
+            if require_cache:
+                return None
 
             result = await func(*args, **kwargs)
             if result is not None:

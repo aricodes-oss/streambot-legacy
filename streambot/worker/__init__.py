@@ -1,9 +1,9 @@
 from contextlib import suppress
+from asyncio import gather
 
 from .tasks import tasks
 
 
 async def work():
-    for task in tasks:
-        with suppress(Exception):
-            await task.run()
+    with suppress(Exception):
+        await gather(*[task.run() for task in tasks])

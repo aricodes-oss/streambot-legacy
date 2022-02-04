@@ -38,7 +38,10 @@ async def _update(reservation):
             reservation.save()
         return
 
-    live_streams = await twitch.get_streams(reservation.game_id)
+    live_streams = await twitch.get_streams(reservation.game_id, require_cache=True)
+    if live_streams is None:  # Cache miss
+        return
+
     if reservation.speedrun_only:
         live_streams = [s for s in live_streams if SPEEDRUN_TAG_ID in s["tag_ids"]]
 
@@ -67,20 +70,12 @@ async def _update(reservation):
         stream for stream in live_streams if stream["user_login"] not in known_usernames
     ]
 
-    # Discord limits us to 5 outgoing messages at once
-    # and then sleeps for a second. If we're posting a HUGELY
-    # popular game, then it's possible that we sleep while posting
-    # and the list updates underneath our feet.
-    needs_mid_refresh = len(new_streams) > 50
-    posted = 0
-
     for stream in new_streams:
         # See previous note about potentially needing mid-refresh
         if stream["user_login"] in known_usernames:
             continue
 
         message = await channel.send(embed=_embed(stream))
-        posted += 1
 
         try:
             Stream.create(
@@ -90,10 +85,6 @@ async def _update(reservation):
             )
         except Exception:
             await message.delete()
-
-        if needs_mid_refresh and posted % 50 == 0:
-            streams = Stream.select().where(reservation=reservation)
-            known_usernames = {s.username for s in streams}
 
 
 async def run():
