@@ -36,4 +36,5 @@ app.conf.update(
     result_serializer="msgpack",
     include=["streambot.worker.tasks"],
     beat_schedule=_beat_schedule,
+    worker_concurrency=2
 )
