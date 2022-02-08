@@ -1,10 +1,10 @@
 import environ
 
-import uvloop
+# import uvloop
 from . import celery  # noqa
 
 env = environ.Env()
 environ.Env.read_env()
-uvloop.install()
+# uvloop.install()
 
 __version__ = "0.1.0"
