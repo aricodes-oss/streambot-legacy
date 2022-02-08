@@ -1,14 +1,17 @@
 from contextlib import suppress
 import asyncio
+import discord
 
 from streambot import twitch
 
 from streambot.logging import logger
 from streambot.constants import SPEEDRUN_TAG_ID
-from streambot.discord import client
+from streambot.discord import managed_client
 from streambot.db import Stream, Reservation
 
 from discord import Embed, Object
+
+client: discord.Client = None
 
 
 def _embed(stream):
@@ -26,10 +29,11 @@ def _embed(stream):
 
 
 async def _update(reservation):
-    guild = client.get_guild(reservation.guild_id)
+    guild = await client.fetch_guild(reservation.guild_id)
     try:
-        channel = guild.get_channel(reservation.channel_id)
-    except Exception:
+        channel = await guild.fetch_channel(reservation.channel_id)
+    except Exception as e:
+        logger.warning(e)
         # Channel no longer exists maybe
         if reservation.strikes >= 5:
             reservation.delete_instance()
@@ -80,6 +84,10 @@ async def _update(reservation):
         if stream["user_login"] in known_usernames:
             continue
 
+        # We can always add more streams later
+        if client.is_ws_ratelimited():
+            return
+
         message = await channel.send(embed=_embed(stream))
 
         try:
@@ -92,9 +100,19 @@ async def _update(reservation):
             await message.delete()
 
 
-async def run():
-    tasks = []
-    for reservation in Reservation.select().prefetch(Stream):
-        tasks.append(_update(reservation))
+async def _run():
+    global client
 
-    await asyncio.gather(*tasks)
+    async with managed_client() as dc:
+        client = dc
+        tasks = []
+        for reservation in Reservation.select().prefetch(Stream):
+            tasks.append(_update(reservation))
+
+        await asyncio.gather(*tasks)
+    client = None
+
+
+def task():
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(_run())

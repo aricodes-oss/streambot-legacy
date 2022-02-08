@@ -1,9 +1,8 @@
-from discord.ext import tasks
 from .logging import logger
 
-from . import env, subscribe, unsubscribe, worker
+from . import env, subscribe, unsubscribe
 from .discord import client
-from .tasks import update_cached_streams
+from .constants import AUTH_TOKEN
 
 
 def _t(w):
@@ -17,22 +16,10 @@ SPEEDRUN = _t("!speedrun")
 TRIGGERS = [SUBSCRIBE, UNSUBSCRIBE, SPEEDRUN]
 
 
-@tasks.loop(seconds=10, reconnect=True)
-async def work():
-    try:
-        await worker.work()
-    except Exception as e:
-        logger.error(e)
-
-
 @client.event
 async def on_ready():
     logger.info(f"Logged in as {client.user}")
     logger.info("Ret-2-Go!")
-
-    if not work.is_running():
-        update_cached_streams.delay()
-        work.start()
 
 
 @client.event
@@ -69,4 +56,4 @@ async def on_message(message):
 
 def main():
     logger.info("Connecting...")
-    client.run(env("DISCORD_BOT_TOKEN"))
+    client.run(AUTH_TOKEN)

@@ -1,14 +1,20 @@
-from asyncio import gather
+from asyncio import gather, get_event_loop
 
-from streambot.discord import client
+import discord
+
+from streambot.logging import logger
+from streambot.discord import managed_client
 from streambot.db import Reservation, Stream
 
+client: discord.Client = None
 
-async def clear_channel(reservation: Reservation):
-    guild = client.get_guild(reservation.guild_id)
+
+async def _clear_channel(reservation: Reservation):
+    guild = await client.fetch_guild(reservation.guild_id)
     try:
-        channel = guild.get_channel(reservation.channel_id)
-    except Exception:
+        channel = await guild.fetch_channel(reservation.channel_id)
+    except Exception as e:
+        logger.error(e)
         return
 
     known_message_ids = {s.message_id for s in Stream.select()}
@@ -19,8 +25,19 @@ async def clear_channel(reservation: Reservation):
             continue
 
         if message.id not in known_message_ids:
+            logger.debug(f"Deleting {message.id}")
             await message.delete()
 
 
-async def run():
-    await gather(*[clear_channel(r) for r in Reservation.select().prefetch(Stream)])
+async def _run():
+    global client
+
+    async with managed_client() as dc:
+        client = dc
+        await gather(*[_clear_channel(r) for r in Reservation.select().prefetch(Stream)])
+        client = None
+
+
+def task():
+    loop = get_event_loop()
+    loop.run_until_complete(_run())
