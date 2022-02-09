@@ -32,6 +32,9 @@ def enqueue(stream: Stream):
     loop.run_until_complete(_check(stream))
 
 
+# Since we're only running a single worker node, all of these tasks
+# will be sharing time with all of the other ones and hopefully
+# not using all of our ratelimit at once
 def task():
     for stream in Stream.select().prefetch(Reservation):
         enqueue.delay(stream)
