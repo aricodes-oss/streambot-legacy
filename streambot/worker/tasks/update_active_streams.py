@@ -32,10 +32,12 @@ async def _update(reservation):
     guild = await client.fetch_guild(reservation.guild_id)
     try:
         channel = await guild.fetch_channel(reservation.channel_id)
+        reservation.strikes = 0
+        reservation.save()
     except Exception as e:
         logger.warning(e)
         # Channel no longer exists maybe
-        if reservation.strikes >= 5:
+        if reservation.strikes >= 150:
             reservation.delete_instance()
         else:
             reservation.strikes += 1
