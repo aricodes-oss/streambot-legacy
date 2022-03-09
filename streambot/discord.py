@@ -2,12 +2,16 @@ import discord
 from contextlib import asynccontextmanager
 from .constants import AUTH_TOKEN
 
-client: discord.Client = discord.Client()
+intents = discord.Intents.default()
+intents.presences = True
+intents.members = True
+
+client: discord.Client = discord.Client(intents=intents)
 
 
 @asynccontextmanager
 async def managed_client():
-    dc: discord.Client = discord.Client()
+    dc: discord.Client = discord.Client(intents=intents)
     await dc.login(AUTH_TOKEN)
 
     try:

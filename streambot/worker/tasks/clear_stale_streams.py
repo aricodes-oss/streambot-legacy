@@ -1,15 +1,16 @@
 from asyncio import gather, get_event_loop
+from typing import Union
 
 import discord
 
 from streambot.logging import logger
 from streambot.discord import managed_client
-from streambot.db import Reservation, Stream
+from streambot.db import Reservation, MemberReservation, Stream, MemberStream
 
 client: discord.Client = None
 
 
-async def _clear_stale_streams(stream: Stream):
+async def _clear_stale_streams(stream: Union[Stream, MemberStream]):
     guild = await client.fetch_guild(stream.reservation.guild_id)
     try:
         channel = await guild.fetch_channel(stream.reservation.channel_id)
@@ -28,6 +29,12 @@ async def _run():
     async with managed_client() as dc:
         client = dc
         await gather(*[_clear_stale_streams(s) for s in Stream.select().prefetch(Reservation)])
+        await gather(
+            *[
+                _clear_stale_streams(s)
+                for s in MemberStream.select().prefetch(MemberReservation)
+            ],
+        )
         client = None
 
 

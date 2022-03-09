@@ -4,7 +4,7 @@ import discord
 
 from streambot.logging import logger
 from streambot.discord import managed_client
-from streambot.db import Reservation, Stream
+from streambot.db import Reservation, MemberReservation, Stream, MemberStream
 
 client: discord.Client = None
 
@@ -17,7 +17,7 @@ async def _clear_channel(reservation: Reservation):
         logger.error(e)
         return
 
-    known_message_ids = {s.message_id for s in Stream.select()}
+    known_message_ids = {s.message_id for s in Stream.select() + MemberStream.select()}
 
     async for message in channel.history(limit=200):
         # Only delete our own messages
@@ -34,7 +34,10 @@ async def _run():
 
     async with managed_client() as dc:
         client = dc
-        await gather(*[_clear_channel(r) for r in Reservation.select().prefetch(Stream)])
+        reservations = Reservation.select().prefetch(
+            Stream,
+        ) + MemberReservation.select().prefetch(MemberStream)
+        await gather(*[_clear_channel(r) for r in reservations])
         client = None
 
 

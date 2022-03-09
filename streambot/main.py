@@ -1,8 +1,9 @@
 from .logging import logger
 
-from . import env, subscribe, unsubscribe
+from . import env, subscribe, unsubscribe, members
 from .discord import client
 from .constants import AUTH_TOKEN
+from .worker.tasks.reconcile_presence import reconcile_presence
 
 
 def _t(w):
@@ -12,8 +13,9 @@ def _t(w):
 SUBSCRIBE = _t("!subscribe")
 UNSUBSCRIBE = _t("!unsubscribe")
 SPEEDRUN = _t("!speedrun")
+MEMBERS = _t("!members")
 
-TRIGGERS = [SUBSCRIBE, UNSUBSCRIBE, SPEEDRUN]
+TRIGGERS = [SUBSCRIBE, UNSUBSCRIBE, SPEEDRUN, MEMBERS]
 
 
 @client.event
@@ -41,6 +43,10 @@ async def on_message(message):
     if not message.author.guild_permissions.administrator:
         await message.channel.send("You lack the permissions to do this")
 
+    if command == MEMBERS:
+        await members.handle(message)
+        return
+
     # Get the name of the game they want
     game_name = message.content[len(command) + 1 :]
     if len(game_name) < 1:
@@ -52,6 +58,11 @@ async def on_message(message):
         SPEEDRUN: subscribe.handle,
         UNSUBSCRIBE: unsubscribe.handle,
     }[command](message, game_name, speedrun_only=command == SPEEDRUN)
+
+
+@client.event
+async def on_presence_update(before, after):
+    await reconcile_presence(after)
 
 
 def main():
