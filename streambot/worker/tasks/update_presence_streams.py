@@ -14,11 +14,6 @@ from typing import Optional
 client: discord.Client = None
 
 
-def _mp_entrypoint():
-    global client
-    client.run()
-
-
 def _embed(member):
     activity = _streaming_activity(member)
 
