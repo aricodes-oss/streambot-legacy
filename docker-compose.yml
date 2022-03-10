@@ -27,7 +27,7 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ./:/code
-    command: poetry run watchmedo auto-restart --patterns="*.py" --recursive -- poetry run celery -A streambot.celery beat --loglevel=INFO
+    command: poetry run watchmedo auto-restart --patterns="*.py" --recursive -- poetry run celery -A streambot.celery beat
 
   cache:
     image: redis:latest

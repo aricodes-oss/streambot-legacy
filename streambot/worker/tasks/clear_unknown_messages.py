@@ -12,7 +12,7 @@ client: discord.Client = None
 async def _clear_channel(reservation: Reservation):
     guild = await client.fetch_guild(reservation.guild_id)
     try:
-        channel = await guild.fetch_channel(reservation.channel_id)
+        channel = await client.fetch_channel(reservation.channel_id)
     except Exception as e:
         logger.error(e)
         return

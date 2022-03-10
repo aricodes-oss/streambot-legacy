@@ -31,7 +31,7 @@ def _embed(stream):
 async def _update(reservation):
     guild = await client.fetch_guild(reservation.guild_id)
     try:
-        channel = await guild.fetch_channel(reservation.channel_id)
+        channel = await client.fetch_channel(reservation.channel_id)
         reservation.strikes = 0
         reservation.save()
     except Exception as e:

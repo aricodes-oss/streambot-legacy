@@ -13,7 +13,7 @@ client: discord.Client = None
 async def _clear_stale_streams(stream: Union[Stream, MemberStream]):
     guild = await client.fetch_guild(stream.reservation.guild_id)
     try:
-        channel = await guild.fetch_channel(stream.reservation.channel_id)
+        channel = await client.fetch_channel(stream.reservation.channel_id)
     except Exception as e:
         logger.error(e)
 

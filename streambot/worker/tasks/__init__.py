@@ -4,9 +4,19 @@ from streambot.celery import app
 from streambot.twitch import get_streams
 from streambot.db import Reservation
 
-from . import update_active_streams, clear_unknown_messages, clear_stale_streams
+from . import (
+    update_active_streams,
+    clear_unknown_messages,
+    clear_stale_streams,
+    update_presence_streams,
+)
 
-_imported = [update_active_streams, clear_unknown_messages, clear_stale_streams]
+_imported = [
+    update_active_streams,
+    clear_unknown_messages,
+    clear_stale_streams,
+    update_presence_streams,
+]
 
 for f in _imported:
     app.task(f.task)
