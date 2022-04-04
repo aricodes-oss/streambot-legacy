@@ -11,18 +11,13 @@ def _task(name, schedule=10.0):
     }
 
 
-_beat_schedule = {
-    "update_cached_streams": {
-        "task": "streambot.worker.tasks.update_cached_streams",
-        "schedule": 10.0,
-        "args": (),
-    },
-}
+_beat_schedule = {}
 
 _task_names = [
     ("update_active_streams", 30.0),
     ("clear_unknown_messages", 120.0),
     ("clear_stale_streams", 240.0),
+    ("get_streams", 60.0),
 ]
 
 for task, schedule in _task_names:
@@ -36,5 +31,5 @@ app.conf.update(
     result_serializer="msgpack",
     include=["streambot.worker.tasks"],
     beat_schedule=_beat_schedule,
-    worker_concurrency=2
+    worker_concurrency=2,
 )

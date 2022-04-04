@@ -2,12 +2,9 @@ from contextlib import suppress
 import asyncio
 import discord
 
-from streambot import twitch
-
 from streambot.logging import logger
-from streambot.constants import SPEEDRUN_TAG_ID
 from streambot.discord import managed_client
-from streambot.db import Stream, Reservation
+from streambot.db import Stream, Reservation, TwitchStream
 
 from discord import Embed, Object
 
@@ -16,13 +13,13 @@ client: discord.Client = None
 
 def _embed(stream):
     result = Embed(
-        title=stream["user_name"],
-        description=stream["title"],
-        url=f"https://twitch.tv/{stream['user_login']}",
+        title=stream.username,
+        description=stream.description,
+        url=f"https://twitch.tv/{stream.username}",
         color=0x0099FF,
     )
 
-    thumbnail_url = stream["thumbnail_url"].replace("{width}", "72").replace("{height}", "72")
+    thumbnail_url = stream.thumbnail_url.replace("{width}", "72").replace("{height}", "72")
     result.set_thumbnail(url=thumbnail_url)
 
     return result
@@ -44,19 +41,15 @@ async def _update(reservation):
             reservation.save()
         return
 
-    live_streams = await twitch.get_streams(reservation.game_id, require_cache=True)
-    if live_streams is None:  # Cache miss
+    live_streams = TwitchStream.select().where(
+        TwitchStream.game_id == reservation.game_id,
+        TwitchStream.is_speedrun == reservation.speedrun_only,
+    )
+    if live_streams is None:
         logger.debug(f"No streams for {reservation.game_id}, skipping")
         return
 
-    if reservation.speedrun_only:
-        live_streams = [
-            s
-            for s in live_streams
-            if s["tag_ids"] is not None and SPEEDRUN_TAG_ID in s["tag_ids"]
-        ]
-
-    live_usernames = {s["user_login"] for s in live_streams}
+    live_usernames = {s.username for s in live_streams}
     known_usernames = {s.username for s in reservation.streams}
 
     with suppress(Exception):
@@ -77,13 +70,11 @@ async def _update(reservation):
         logger.error(e)
 
     # Add new ones
-    new_streams = [
-        stream for stream in live_streams if stream["user_login"] not in known_usernames
-    ]
+    new_streams = [stream for stream in live_streams if stream.username not in known_usernames]
 
     for stream in new_streams:
         # See previous note about potentially needing mid-refresh
-        if stream["user_login"] in known_usernames:
+        if stream.username in known_usernames:
             continue
 
         # We can always add more streams later
@@ -95,7 +86,7 @@ async def _update(reservation):
         try:
             Stream.create(
                 reservation=reservation,
-                username=stream["user_login"],
+                username=stream.username,
                 message_id=message.id,
             )
         except Exception:
