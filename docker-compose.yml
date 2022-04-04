@@ -8,6 +8,8 @@ services:
       - PYTHONUNBUFFERED=1
     volumes:
       - ./:/code
+    depends_on:
+      - cache
 
   worker:
     build:
@@ -18,6 +20,8 @@ services:
     volumes:
       - ./:/code
     command: poetry run watchmedo auto-restart --patterns="*.py" --recursive -- poetry run celery -A streambot.celery worker --loglevel=INFO -P processes
+    depends_on:
+      - cache
 
   scheduler:
     build:
@@ -28,6 +32,8 @@ services:
     volumes:
       - ./:/code
     command: poetry run watchmedo auto-restart --patterns="*.py" --recursive -- poetry run celery -A streambot.celery beat --loglevel=INFO
+    depends_on:
+      - cache
 
   cache:
     image: redis:latest
