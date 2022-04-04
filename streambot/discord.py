@@ -2,7 +2,7 @@ import discord
 from contextlib import asynccontextmanager
 from .constants import AUTH_TOKEN
 
-intents = discord.Intents.all()
+intents = discord.Intents().all()
 intents.presences = True
 intents.members = True
 cache_flags = discord.MemberCacheFlags.all()

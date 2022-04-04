@@ -63,8 +63,8 @@ async def _update(reservation):
         return
 
     all_members = await guild.fetch_members(limit=None).flatten()
-    for member in guild.members:
-        logger.info(member.status)
+    for member in all_members:
+        logger.info(member.activity)
     known_user_ids = {s.member_id for s in reservation.streams}
     live_members = [m for m in all_members if _is_streaming(m)]
     live_ids = [m.id for m in live_members]
