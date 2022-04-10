@@ -41,12 +41,13 @@ async def _update(reservation):
             reservation.save()
         return
 
-    live_streams = list(
-        TwitchStream.select().where(
-            TwitchStream.game_id == reservation.game_id,
+    live_streams = TwitchStream.select().where(TwitchStream.game_id == reservation.game_id)
+
+    if reservation.speedrun_only:
+        live_streams = live_streams.where(
             TwitchStream.is_speedrun == reservation.speedrun_only,
-        ),
-    )
+        )
+
     if live_streams is None:
         logger.warning(f"No streams for {reservation.game_id}, skipping")
         return
