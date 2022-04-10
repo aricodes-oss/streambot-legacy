@@ -41,12 +41,14 @@ async def _update(reservation):
             reservation.save()
         return
 
-    live_streams = TwitchStream.select().where(
-        TwitchStream.game_id == reservation.game_id,
-        TwitchStream.is_speedrun == reservation.speedrun_only,
+    live_streams = list(
+        TwitchStream.select().where(
+            TwitchStream.game_id == reservation.game_id,
+            TwitchStream.is_speedrun == reservation.speedrun_only,
+        ),
     )
     if live_streams is None:
-        logger.debug(f"No streams for {reservation.game_id}, skipping")
+        logger.warning(f"No streams for {reservation.game_id}, skipping")
         return
 
     live_usernames = {s.username for s in live_streams}
@@ -80,6 +82,8 @@ async def _update(reservation):
         # We can always add more streams later
         if client.is_ws_ratelimited():
             return
+
+        logger.info(f"Posting stream for {stream.username}/{stream.game_id}")
 
         message = await channel.send(embed=_embed(stream))
 
