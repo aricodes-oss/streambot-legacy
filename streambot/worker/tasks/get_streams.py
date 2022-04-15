@@ -7,11 +7,6 @@ import asyncio
 import discord
 
 
-async def _flush(game_id: str) -> None:
-    q = TwitchStream.delete().where(TwitchStream.game_id == game_id)
-    q.execute()
-
-
 def _stream_to_instance(stream, game_id: str) -> TwitchStream:
     res: TwitchStream = TwitchStream(
         username=stream["user_login"],
@@ -29,8 +24,15 @@ async def _pull(game_id: str, client: discord.Client) -> None:
     live_streams = await get_streams(game_id)
     unsaved_instances = [_stream_to_instance(stream, game_id) for stream in live_streams]
 
-    await _flush(game_id)
+    # Fetch the list of entries to delete ahead of time and make sure
+    # the new ones are inserted first to avoid a race condition
+    old_stream_ids = [
+        t.id for t in TwitchStream.select().where(TwitchStream.game_id == game_id)
+    ]
+
     TwitchStream.bulk_create(unsaved_instances)
+    q = TwitchStream.delete().where(TwitchStream.id.in_(old_stream_ids))
+    q.execute()
 
 
 async def _run() -> None:
