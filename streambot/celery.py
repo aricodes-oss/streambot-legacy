@@ -14,10 +14,10 @@ def _task(name, schedule=10.0):
 _beat_schedule = {}
 
 _task_names = [
-    ("update_active_streams", 65.0),
+    ("update_active_streams", 100.0),
     ("clear_unknown_messages", 120.0),
     ("clear_stale_streams", 240.0),
-    ("get_streams", 30.0),
+    ("get_streams", 60.0),
 ]
 
 for task, schedule in _task_names:
