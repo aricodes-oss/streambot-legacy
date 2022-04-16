@@ -4,7 +4,7 @@ import discord
 
 from streambot.logging import logger
 from streambot.discord import managed_client
-from streambot.db import Stream, Reservation, TwitchStream
+from streambot.db import Stream, Reservation, TwitchStream, connection as db
 
 from discord import Embed, Object
 
@@ -65,12 +65,13 @@ async def _update(reservation):
         if len(messages_to_delete) > 0:
             await channel.delete_messages(messages_to_delete)
 
-    try:
-        for stream in reservation.streams:
-            if stream.username not in live_usernames:
-                stream.delete_instance()
-    except Exception as e:
-        logger.error(e)
+    with db.atomic("IMMEDIATE"):
+        try:
+            for stream in reservation.streams:
+                if stream.username not in live_usernames:
+                    stream.delete_instance()
+        except Exception as e:
+            logger.error(e)
 
     # Add new ones
     new_streams = [stream for stream in live_streams if stream.username not in known_usernames]

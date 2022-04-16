@@ -1,5 +1,5 @@
 from streambot.constants import SPEEDRUN_TAG_ID
-from streambot.db import TwitchStream, Reservation
+from streambot.db import TwitchStream, Reservation, connection as db
 from streambot.discord import managed_client
 from streambot.twitch import get_streams
 
@@ -30,9 +30,10 @@ async def _pull(game_id: str, client: discord.Client) -> None:
         t.id for t in TwitchStream.select().where(TwitchStream.game_id == game_id)
     ]
 
-    TwitchStream.bulk_create(unsaved_instances)
-    q = TwitchStream.delete().where(TwitchStream.id.in_(old_stream_ids))
-    q.execute()
+    with db.atomic("EXCLUSIVE"):
+        TwitchStream.bulk_create(unsaved_instances)
+        q = TwitchStream.delete().where(TwitchStream.id.in_(old_stream_ids))
+        q.execute()
 
 
 async def _run() -> None:
